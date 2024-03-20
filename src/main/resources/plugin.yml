@@ -1,0 +1,5 @@
+name: InfiniteItems
+description: Create items only limited by your imagination!
+version: ${project.version}
+main: me.sql.infiniteitems.InfiniteItems
+api-version: 1.20
