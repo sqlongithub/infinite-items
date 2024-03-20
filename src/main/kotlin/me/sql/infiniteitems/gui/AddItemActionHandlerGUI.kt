@@ -12,8 +12,6 @@ import me.sql.infiniteitems.item.action.handler.ActionHandler
 import me.sql.infiniteitems.item.action.handler.RightClickActionHandler
 import me.sql.infiniteitems.item.action.operation.NoneOperation
 import me.sql.infiniteitems.item.action.operation.Operation
-import me.sql.infiniteitems.item.action.operation.SendMessageOperation
-import me.sql.infiniteitems.item.action.operation.data.PlayersOperationData
 import me.sql.infiniteitems.util.add
 import me.sql.infiniteitems.util.asTextComponent
 import me.sql.infiniteitems.util.getBackgroundPane
@@ -219,14 +217,15 @@ class AddItemActionHandlerGUI(private val player: Player, private val item: Cust
         val meta = item.itemMeta!!
 
         val lore = ArrayList<TextComponent>()
-        lore.add("")
         if(actionHandler.operation !is NoneOperation) {
             item.type = Material.GREEN_CONCRETE
             meta.displayName("§aAdd Handler".asTextComponent().withoutItalics())
             lore.add("§eClick to add this handler to the item!")
         } else {
-            lore.add("§cYou must configure an §aOperation§7 first.")
+            meta.displayName("§cNo Operation".asTextComponent().withoutItalics())
+            lore.add("§7You must configure an §aOperation§7 first.")
         }
+        meta.lore(lore)
 
         item.itemMeta = meta
         return GuiItem(item) {
