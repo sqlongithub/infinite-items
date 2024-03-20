@@ -6,6 +6,7 @@ import me.sql.infiniteitems.item.action.operation.data.PlayersOperationData
 
 class SendMessageOperation(private val message: MessageOperationData, private val players: PlayersOperationData) : Operation {
 
+    override val type = OperationType.SEND_MESSAGE
     override val name: String = "Send Message"
     override val description: String
         get() = "Send a message to §a${getFormattedPlayers()}"
