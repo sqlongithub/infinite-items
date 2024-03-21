@@ -6,6 +6,7 @@ import com.github.stefvanschie.inventoryframework.pane.OutlinePane
 import com.github.stefvanschie.inventoryframework.pane.StaticPane
 import me.sql.infiniteitems.item.CustomItem
 import me.sql.infiniteitems.item.action.Action
+import me.sql.infiniteitems.item.action.ActionType
 import me.sql.infiniteitems.item.action.condition.Condition
 import me.sql.infiniteitems.item.action.condition.NoneCondition
 import me.sql.infiniteitems.item.action.handler.ActionHandler
@@ -22,12 +23,13 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
-class AddItemActionHandlerGUI(private val player: Player, private val item: CustomItem) {
+class AddItemActionHandlerGUI(private val player: Player,
+                              private val item: CustomItem,
+                              var actionHandler: ActionHandler<Action> = RightClickActionHandler(
+                                  NoneOperation(),
+                                  NoneCondition()
+                              )) {
 
-    private var actionHandler: ActionHandler<Action> = RightClickActionHandler(
-        NoneOperation(),
-        NoneCondition()
-    )
 
     private fun getReturnItem(): GuiItem {
         val item = ItemStack(Material.ARROW)
@@ -57,12 +59,14 @@ class AddItemActionHandlerGUI(private val player: Player, private val item: Cust
         item.itemMeta = meta
 
         return GuiItem(item) { click ->
-            SelectActionGUI(this.item, actionHandler.type) { type ->
-                this.actionHandler = type.handlerClass.java
+            SelectSelectableGUI("Selecting Action Type", player, ActionType.entries, { type ->
+                this.actionHandler = (type as ActionType).handlerClass.java
                     .getDeclaredConstructor(Operation::class.java, Condition::class.java)
                     .newInstance(actionHandler.operation, actionHandler.condition)
                 this.show()
-            }.show(click.whoClicked as Player)
+            }, { player ->
+                AddItemActionHandlerGUI(player, this.item).show()
+            }, "Execute when ", this.actionHandler.type).show()
         }
     }
 
@@ -150,7 +154,8 @@ class AddItemActionHandlerGUI(private val player: Player, private val item: Cust
         val lore  = ArrayList<TextComponent>()
         lore.add("§7Current: §a${actionHandler.operation.description}")
         for(operationData in actionHandler.operation.data) {
-            lore.add("  §8 - $operationData")
+            if(operationData != null)
+                lore.add("  §8 - $operationData")
         }
         lore.add("")
         lore.add("§7This is what will happen when the selected §aAction§7")
@@ -162,7 +167,7 @@ class AddItemActionHandlerGUI(private val player: Player, private val item: Cust
 
         item.itemMeta = meta
         return GuiItem(item) {
-
+            ConfigureOperationGUI(this.item, this.actionHandler).show(player)
         }
     }
 
@@ -196,7 +201,7 @@ class AddItemActionHandlerGUI(private val player: Player, private val item: Cust
 
         val lore = ArrayList<TextComponent>()
         lore.add("§7When")
-        lore.add("  §7 - §a${actionHandler.type.whenever}")
+        lore.add("  §7 - §a${actionHandler.type.description}")
         if(actionHandler.condition !is NoneCondition) {
             lore.add("§7and")
             lore.add("  §7 - §a${actionHandler.condition.description}")
