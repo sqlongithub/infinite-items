@@ -1,9 +1,10 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.jetbrains.kotlin.ir.backend.js.compile
 
 plugins {
     java
-    kotlin("jvm") version "2.0.0-Beta4"
+    kotlin("jvm") version "2.0.0-Beta5"
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
@@ -18,6 +19,9 @@ java {
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://api.modrinth.com/maven")
+    }
     maven {
         url = uri("https://repo.papermc.io/repository/maven-public/")
     }
