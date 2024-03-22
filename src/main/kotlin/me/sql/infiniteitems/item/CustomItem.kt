@@ -7,8 +7,10 @@ import me.sql.infiniteitems.util.withoutItalics
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
+import net.minecraft.nbt.CompoundTag
 import org.bukkit.ChatColor
 import org.bukkit.Material
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
@@ -36,14 +38,17 @@ class CustomItem(
         private set
 
     fun getItemStack(player: Player): ItemStack {
-        val itemStack = ItemStack(material)
+        var itemStack = ItemStack(material)
+
+        val nmsItem = CraftItemStack.asNMSCopy(itemStack)
+        val tag = CompoundTag()
+        tag.putString(CustomItemRegistry.IDENTIFIER_TAG, identifier)
+        nmsItem.tag = tag
+
+        itemStack = nmsItem.asBukkitMirror()
         val meta = itemStack.itemMeta!!
         meta.displayName(name)
-
-        meta.persistentDataContainer.set(CustomItemRegistry.IDENTIFIER_KEY, PersistentDataType.STRING, identifier)
         itemStack.itemMeta = meta
-
-
 
         return itemStack
     }

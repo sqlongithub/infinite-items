@@ -4,6 +4,7 @@ import me.sql.infiniteitems.InfiniteItems
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 
@@ -11,7 +12,7 @@ class CustomItemRegistry {
 
     companion object {
 
-        val IDENTIFIER_KEY = NamespacedKey(InfiniteItems.instance, "customItemIdentifier")
+        val IDENTIFIER_TAG = "infiniteitems_custom_item_identifier"
         private val registry = mutableMapOf<String, CustomItem>()
         val size
             get() = registry.size
@@ -27,6 +28,8 @@ class CustomItemRegistry {
             }
             registry[customItem.identifier] = customItem
         }
+
+        fun isRegistered(identifier: String?): Boolean = registry.containsKey(identifier)
 
         fun get(identifier: String?): CustomItem? {
             if(identifier == null)
@@ -50,9 +53,9 @@ class CustomItemRegistry {
                 return null
 
             var customItem: CustomItem? = null
-            val meta = item.itemMeta
-            if(meta.persistentDataContainer.has(IDENTIFIER_KEY)) {
-                customItem = get(meta.persistentDataContainer.get(IDENTIFIER_KEY, PersistentDataType.STRING))
+            val nbt = CraftItemStack.asNMSCopy(item).tag
+            if(nbt != null) {
+                customItem = get(nbt.getString(IDENTIFIER_TAG))
             }
             return customItem
         }

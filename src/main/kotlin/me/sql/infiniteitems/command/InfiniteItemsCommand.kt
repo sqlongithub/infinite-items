@@ -32,6 +32,10 @@ class InfiniteItemsCommand : BaseCommand() {
         lateinit var customItem: CustomItem
         if(identifier.isNotEmpty()) {
             val identifierString = identifier.joinToString(" ").lowercase().replace(" ", "_")
+            if(CustomItemRegistry.isRegistered(identifierString)) {
+                player.sendMessage("§cAn item with the identifier $identifierString already exists!")
+                return
+            }
             customItem = CustomItem(identifierString)
         } else {
             player.sendMessage("§cYou need to specify an identifier. Example: §a/ii c item1")

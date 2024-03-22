@@ -14,6 +14,7 @@ import me.sql.infiniteitems.util.asTextComponent
 import me.sql.infiniteitems.util.withoutItalics
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack
 import org.bukkit.entity.Player
 import org.bukkit.persistence.PersistentDataType
 import kotlin.test.*
@@ -43,7 +44,9 @@ class CustomItemTest {
         assertNotNull(itemStack)
         assertEquals(Material.DIRT, itemStack.type)
         assertEquals(customItem.name, itemStack.itemMeta.displayName())
-        assertEquals(customItem.identifier, itemStack.itemMeta.persistentDataContainer.get(CustomItemRegistry.IDENTIFIER_KEY, PersistentDataType.STRING))
+        val nms = CraftItemStack.asNMSCopy(itemStack)
+        assert(nms.hasTag())
+        assertEquals(customItem.identifier, nms.tag!!.getString(CustomItemRegistry.IDENTIFIER_TAG))
 
     }
 
