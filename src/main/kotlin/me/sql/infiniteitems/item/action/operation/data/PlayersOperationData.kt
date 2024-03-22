@@ -44,17 +44,30 @@ class PlayersOperationData(
         togglesPane.gap = 1
         val isAllItem = ItemStack(if(isAll) { Material.LIME_DYE } else { Material.GRAY_DYE })
         val isAllMeta = isAllItem.itemMeta!!
+        val isAllLore = ArrayList<TextComponent>()
 
         val thePlayerItem = ItemStack(if(isUser) { Material.LIME_DYE } else { Material.GRAY_DYE })
         val thePlayerMeta = thePlayerItem.itemMeta!!
         val thePlayerLore = ArrayList<TextComponent>()
 
+        val updateGui = {
+            isAllItem.type = if(isAll) { Material.LIME_DYE } else { Material.GRAY_DYE }
+            // should this be currently instead of current?
+            isAllLore[0] = ("§7Current: " + if(isAll) { "§aYes" } else { "§cNo" }).asTextComponent()
+            isAllMeta.lore(isAllLore)
+            isAllItem.itemMeta = isAllMeta
+
+            thePlayerItem.type = if(isUser) { Material.LIME_DYE } else { Material.GRAY_DYE }
+            thePlayerLore[0] = ("§7Current: " + if(isUser) { "§aYes" } else { "§cNo" }).asTextComponent()
+            thePlayerMeta.lore(thePlayerLore)
+            thePlayerItem.itemMeta = thePlayerMeta
+        }
+
         isAllMeta.displayName("§aEveryone".asTextComponent().withoutItalics())
-        val lore = ArrayList<TextComponent>()
-        lore.add("§7Current: " + if(isAll) { "§aEveryone" } else { "§cNo" })
-        lore.add("")
-        lore.add("§eClick to toggle!")
-        isAllMeta.lore(lore)
+        isAllLore.add("§7Current: " + if(isAll) { "§aEveryone" } else { "§cNo" })
+        isAllLore.add("")
+        isAllLore.add("§eClick to toggle!")
+        isAllMeta.lore(isAllLore)
         isAllItem.itemMeta = isAllMeta
 
         val playersPane = OutlinePane(1, 1, 7, 4)
@@ -65,16 +78,7 @@ class PlayersOperationData(
         togglesPane.addItem(GuiItem(isAllItem) {
             isAll = !isAll
             isUser = false
-            isAllItem.type = if(isAll) { Material.LIME_DYE } else { Material.GRAY_DYE }
-            // should this be currently instead of current?
-            lore[0] = ("§7Current: " + if(isAll) { "§aYes" } else { "§cNo" }).asTextComponent()
-            isAllMeta.lore(lore)
-            isAllItem.itemMeta = isAllMeta
-
-            thePlayerItem.type = if(isUser) { Material.LIME_DYE } else { Material.GRAY_DYE }
-            thePlayerLore[0] = ("§7Current: " + if(isUser) { "§aYes" } else { "§cNo" }).asTextComponent()
-            thePlayerMeta.lore(thePlayerLore)
-            thePlayerItem.itemMeta = thePlayerMeta
+            updateGui()
             if(isAll || isUser) {
                 playersPane.isVisible = false
             } else {
@@ -95,15 +99,7 @@ class PlayersOperationData(
         togglesPane.addItem(GuiItem(thePlayerItem) {
             isUser = !isUser
             isAll = false
-            isAllItem.type = if(isAll) { Material.LIME_DYE } else { Material.GRAY_DYE }
-            lore[0] = ("§7Current: " + if(isAll) { "§aYes" } else { "§cNo" }).asTextComponent()
-            isAllMeta.lore(lore)
-            isAllItem.itemMeta = isAllMeta
-
-            thePlayerItem.type = if(isUser) { Material.LIME_DYE } else { Material.GRAY_DYE }
-            thePlayerLore[0] = ("§7Current: " + if(isUser) { "§aYes" } else { "§cNo" }).asTextComponent()
-            thePlayerMeta.lore(thePlayerLore)
-            thePlayerItem.itemMeta = thePlayerMeta
+            updateGui()
 
             playersPane.isVisible = !(isAll || isUser)
             gui.update()
