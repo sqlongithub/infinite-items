@@ -12,7 +12,7 @@ interface OperationData {
     val description: String
     val material: Material
     fun showConfigurationGUI(player: Player, onReturn: Consumer<in OperationData>)
-    fun getFormattedValue(player: Player): String
+    fun getFormattedValue(player: Player?): String
     fun toString(player: Player): String
 
 }

@@ -14,6 +14,6 @@ class RightClickActionHandler(override var operation: Operation, override var co
         if(InfiniteItems.debugging) {
             action.player.sendMessage("action handled")
         }
-        operation.execute()
+        operation.execute(action.player)
     }
 }

@@ -7,6 +7,7 @@ import com.github.stefvanschie.inventoryframework.pane.PaginatedPane
 import com.github.stefvanschie.inventoryframework.pane.Pane
 import me.sql.infiniteitems.util.asTextComponent
 import me.sql.infiniteitems.util.getBackgroundPane
+import me.sql.infiniteitems.util.toInt
 import me.sql.infiniteitems.util.withoutItalics
 import net.minecraft.world.item.Item
 import org.bukkit.Bukkit
@@ -42,6 +43,7 @@ class SelectMaterialGUI(val player: Player, private val onSelect: Consumer<Mater
                 } else { if(material.isItem) {
                     CraftMagicNumbers.getItem(material).isEnabled((player.world as CraftWorld).handle.enabledFeatures())
                 } else { false }}}
+            .sorted { o1, o2 ->  o1.isBlock.toInt() - o2.isBlock.toInt()}
             .map { getMaterialItem(it) }
             .collect(Collectors.toCollection { return@toCollection LinkedList() })
 

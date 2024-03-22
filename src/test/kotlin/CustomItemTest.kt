@@ -20,7 +20,8 @@ import org.bukkit.persistence.PersistentDataType
 import kotlin.test.*
 
 class CustomItemTest {
-
+    // tests are broken because of paperweight userdev thing messing with mockbukkit
+    // there is an issue on mockbukkit's GitHub page about it with a fix, but I couldn't get it to work
 
     private lateinit var server: ServerMock
     private lateinit var plugin: Any
@@ -54,7 +55,7 @@ class CustomItemTest {
      fun testActionHandler() {
          val customItem = CustomItem("custom item", "§cSuper§aCool§9Item".asTextComponent(), Material.DIRT, 64)
 
-         val players = PlayersOperationData(true)
+         val players = PlayersOperationData(true, false)
          val message = MessageOperationData { _: Player ->
              return@MessageOperationData "test".asTextComponent()
          }

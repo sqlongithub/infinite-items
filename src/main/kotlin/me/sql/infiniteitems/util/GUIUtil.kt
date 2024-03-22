@@ -67,5 +67,6 @@ fun stringToMultiLineLore(loreString: String, lineLength: Int, prefix: String = 
     }
     lore.add(line)
     return lore
-
 }
+
+fun Boolean.toInt(): Int = if(this) 1 else 0

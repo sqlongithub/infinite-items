@@ -24,7 +24,7 @@ import org.bukkit.scheduler.BukkitTask
 import java.util.function.Consumer
 
 class PlayersOperationData(
-    var isAll: Boolean,
+    var isAll: Boolean, var isUser: Boolean,
     private var players: ArrayList<OfflinePlayer> = ArrayList()
 ) : OperationData {
 
@@ -32,6 +32,7 @@ class PlayersOperationData(
     override val description = "These are the players the operation applies to."
     override val material = Material.PLAYER_HEAD
 
+    // TODO: this code needs cleaning
     override fun showConfigurationGUI(player: Player, onReturn: Consumer<in OperationData>) {
         val gui = ChestGui(6, "Selecting Players")
         gui.addPane(getBackgroundPane(6))
@@ -39,9 +40,14 @@ class PlayersOperationData(
             click.isCancelled = true
         }
 
-        val isAllPane = StaticPane(4, 0, 1, 1)
+        val togglesPane = OutlinePane(3, 0, 3, 1)
+        togglesPane.gap = 1
         val isAllItem = ItemStack(if(isAll) { Material.LIME_DYE } else { Material.GRAY_DYE })
         val isAllMeta = isAllItem.itemMeta!!
+
+        val thePlayerItem = ItemStack(if(isUser) { Material.LIME_DYE } else { Material.GRAY_DYE })
+        val thePlayerMeta = thePlayerItem.itemMeta!!
+        val thePlayerLore = ArrayList<TextComponent>()
 
         isAllMeta.displayName("§aEveryone".asTextComponent().withoutItalics())
         val lore = ArrayList<TextComponent>()
@@ -53,26 +59,57 @@ class PlayersOperationData(
 
         val playersPane = OutlinePane(1, 1, 7, 4)
         playersPane.priority = Pane.Priority.HIGH
-        if(isAll) playersPane.isVisible = false
+        if(isAll || isUser) playersPane.isVisible = false
         gui.addPane(playersPane)
-
-        isAllPane.addItem(GuiItem(isAllItem) {
+        // TODO: minimize code duplication or dont if u are theprimeagen idk there is a yellow line in my ide that's annoying
+        togglesPane.addItem(GuiItem(isAllItem) {
             isAll = !isAll
+            isUser = false
             isAllItem.type = if(isAll) { Material.LIME_DYE } else { Material.GRAY_DYE }
+            // should this be currently instead of current?
             lore[0] = ("§7Current: " + if(isAll) { "§aYes" } else { "§cNo" }).asTextComponent()
             isAllMeta.lore(lore)
             isAllItem.itemMeta = isAllMeta
 
-            if(isAll) {
+            thePlayerItem.type = if(isUser) { Material.LIME_DYE } else { Material.GRAY_DYE }
+            thePlayerLore[0] = ("§7Current: " + if(isUser) { "§aYes" } else { "§cNo" }).asTextComponent()
+            thePlayerMeta.lore(thePlayerLore)
+            thePlayerItem.itemMeta = thePlayerMeta
+            if(isAll || isUser) {
                 playersPane.isVisible = false
             } else {
                 playersPane.isVisible = true
             }
 
             gui.update()
-        }, 0, 0)
+        })
 
-        gui.addPane(isAllPane)
+        thePlayerMeta.displayName("§aThe player".asTextComponent().withoutItalics())
+        thePlayerLore.add("§7Current: " + if(isUser) { "§aYes" } else { "§cNo" })
+        thePlayerLore.add("§7Apply to the player who is holding the item")
+        thePlayerLore.add("")
+        thePlayerLore.add("§eClick to toggle!")
+        thePlayerMeta.lore(thePlayerLore)
+        thePlayerItem.itemMeta = thePlayerMeta
+
+        togglesPane.addItem(GuiItem(thePlayerItem) {
+            isUser = !isUser
+            isAll = false
+            isAllItem.type = if(isAll) { Material.LIME_DYE } else { Material.GRAY_DYE }
+            lore[0] = ("§7Current: " + if(isAll) { "§aYes" } else { "§cNo" }).asTextComponent()
+            isAllMeta.lore(lore)
+            isAllItem.itemMeta = isAllMeta
+
+            thePlayerItem.type = if(isUser) { Material.LIME_DYE } else { Material.GRAY_DYE }
+            thePlayerLore[0] = ("§7Current: " + if(isUser) { "§aYes" } else { "§cNo" }).asTextComponent()
+            thePlayerMeta.lore(thePlayerLore)
+            thePlayerItem.itemMeta = thePlayerMeta
+
+            playersPane.isVisible = !(isAll || isUser)
+            gui.update()
+        })
+
+        gui.addPane(togglesPane)
 
         for(listPlayer in players) {
             val playerItem = ItemStack(Material.PLAYER_HEAD)
@@ -160,9 +197,11 @@ class PlayersOperationData(
         gui.show(player)
     }
 
-    override fun getFormattedValue(player: Player): String {
+    override fun getFormattedValue(player: Player?): String {
         if(isAll) {
             return "everyone"
+        } else if(isUser) {
+            return "the player"
         } else {
             if(players.isEmpty()) {
                 return "no one"
@@ -175,9 +214,12 @@ class PlayersOperationData(
         return ("to: §a${getFormattedValue(player)}")
     }
 
-    fun getOnlinePlayers(): List<Player> = when(isAll) {
+    fun getOnlinePlayers(player: Player): List<Player> = when(isAll) {
         true -> Bukkit.getOnlinePlayers().toList()
-        else -> players.filterIsInstance<Player>()
+        else -> when(isUser) {
+            true -> listOf(player)
+            else -> players.filterIsInstance<Player>()
+        }
 
     }
 

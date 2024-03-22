@@ -1,6 +1,7 @@
 package me.sql.infiniteitems.item.action.operation
 
 import me.sql.infiniteitems.item.action.operation.data.OperationData
+import org.bukkit.entity.Player
 
 interface Operation {
 
@@ -8,6 +9,6 @@ interface Operation {
     val name: String
     val description: String
     val data: List<OperationData>
-    fun execute()
+    fun execute(player: Player)
 
 }

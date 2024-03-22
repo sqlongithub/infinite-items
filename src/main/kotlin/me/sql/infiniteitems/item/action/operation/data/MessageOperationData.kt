@@ -5,6 +5,7 @@ import me.sql.infiniteitems.util.asTextComponent
 import me.sql.infiniteitems.util.withoutItalics
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
+import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -38,7 +39,11 @@ class MessageOperationData(var getMessage: (Player) -> TextComponent) : Operatio
         gui.show(player)
     }
 
-    override fun getFormattedValue(player: Player): String {
+    override fun getFormattedValue(player: Player?): String {
+        if(player == null) {
+            Bukkit.getLogger().warning("MessageOperationData#getFormattedValue called with player = null")
+            return ""
+        }
         return "§f" + getMessage.invoke(player).color(NamedTextColor.WHITE).content()
     }
 
