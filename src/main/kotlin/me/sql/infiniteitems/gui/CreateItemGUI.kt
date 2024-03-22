@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack
 import java.util.function.Consumer
 import kotlin.time.measureTime
 
-class CreateItemGUI(val customItem: CustomItem, val player: Player) {
+class CreateItemGUI(private val customItem: CustomItem, val player: Player) {
 
     private fun getChangeItemNameButton(): GuiItem {
         val itemStack = ItemStack(Material.OAK_SIGN)
@@ -47,7 +47,7 @@ class CreateItemGUI(val customItem: CustomItem, val player: Player) {
         return guiItem
     }
 
-    private fun getChangeItemTypeButton(): GuiItem {
+    private fun getChangeItemMaterialButton(): GuiItem {
         val itemStack = ItemStack(customItem.material)
         val itemMeta = itemStack.itemMeta!!
 
@@ -60,8 +60,11 @@ class CreateItemGUI(val customItem: CustomItem, val player: Player) {
 
         itemMeta.lore(lore)
         itemStack.itemMeta = itemMeta
-        val guiItem = GuiItem(itemStack) { event ->
-            event.whoClicked.sendMessage("change material")
+        val guiItem = GuiItem(itemStack) { click ->
+            SelectMaterialGUI(player) { material ->
+                this.customItem.material = material
+                show()
+            }.show()
         }
 
         return guiItem
@@ -161,7 +164,7 @@ class CreateItemGUI(val customItem: CustomItem, val player: Player) {
 
             val itemPropertiesPane = OutlinePane(1, 1, 2, 3)
             itemPropertiesPane.addItem(getChangeItemNameButton())
-            itemPropertiesPane.addItem(getChangeItemTypeButton())
+            itemPropertiesPane.addItem(getChangeItemMaterialButton())
             itemPropertiesPane.addItem(getChangeItemMaxStackSizeButton())
             gui.addPane(itemPropertiesPane)
 

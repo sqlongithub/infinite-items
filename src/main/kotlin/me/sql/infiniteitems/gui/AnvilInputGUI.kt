@@ -49,12 +49,15 @@ class AnvilInputGUI(
             click.isCancelled = true
         }
         anvilGui.setOnNameInputChanged { name ->
-            val meta = firstItem.item.itemMeta
+            val item = firstItem.item
+            val meta = item.itemMeta
             meta.displayName(Component.text(name).withoutItalics().color(NamedTextColor.WHITE))
-            firstItem.item.itemMeta = meta
+            item.itemMeta = meta
+            firstItem.item = item
 
             meta.displayName(Component.text(ChatColor.translateAlternateColorCodes('&', name)).withoutItalics().color(NamedTextColor.WHITE))
-            resultItem.item.itemMeta = meta
+            item.itemMeta = meta
+            resultItem.item = item
             anvilGui.update()
         }
         anvilGui.firstItemComponent.addPane(firstItemPane)

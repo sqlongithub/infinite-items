@@ -5,7 +5,6 @@ import me.sql.infiniteitems.item.action.operation.data.OperationData
 import me.sql.infiniteitems.item.action.operation.data.PlayersOperationData
 import me.sql.infiniteitems.util.asTextComponent
 import me.sql.infiniteitems.util.withoutItalics
-import org.bukkit.Bukkit
 
 class SendMessageOperation(private val message: MessageOperationData, private val players: PlayersOperationData) : Operation {
 
@@ -22,10 +21,10 @@ class SendMessageOperation(private val message: MessageOperationData, private va
 
     private fun getFormattedPlayers(): String {
         val players = players.getPlayers()
-        if(players.isNullOrEmpty()) {
-            return "no one."
-        } else if(this.players.isAll) {
+        if(this.players.isAll) {
             return "everyone."
+        } else if(players.isEmpty()) {
+            return "no one."
         } else {
             var string = ""
             string += players[0].name
