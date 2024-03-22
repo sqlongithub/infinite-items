@@ -5,7 +5,7 @@ import me.sql.infiniteitems.event.ActionListener
 import me.sql.infiniteitems.item.CustomItem
 import me.sql.infiniteitems.item.CustomItemRegistry
 import me.sql.infiniteitems.item.action.ActionType
-import me.sql.infiniteitems.item.action.RightClickAction
+import me.sql.infiniteitems.item.action.type.RightClickAction
 import me.sql.infiniteitems.item.action.condition.NoneCondition
 import me.sql.infiniteitems.item.action.handler.ActionHandler
 import me.sql.infiniteitems.item.action.operation.SendMessageOperation

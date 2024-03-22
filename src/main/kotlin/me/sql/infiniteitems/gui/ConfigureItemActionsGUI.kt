@@ -7,7 +7,6 @@ import com.github.stefvanschie.inventoryframework.pane.OutlinePane
 import com.github.stefvanschie.inventoryframework.pane.Pane
 import com.github.stefvanschie.inventoryframework.pane.StaticPane
 import me.sql.infiniteitems.item.CustomItem
-import me.sql.infiniteitems.item.action.Action
 import me.sql.infiniteitems.item.action.condition.NoneCondition
 import me.sql.infiniteitems.item.action.handler.ActionHandler
 import me.sql.infiniteitems.util.add
@@ -32,7 +31,7 @@ class ConfigureItemActionsGUI(private val item: CustomItem) {
         }
     }
 
-    private fun getHandlerItem(handler: ActionHandler<Action>): GuiItem {
+    private fun getHandlerItem(handler: ActionHandler): GuiItem {
         val item = ItemStack(Material.COMPARATOR)
         val meta = item.itemMeta!!
 

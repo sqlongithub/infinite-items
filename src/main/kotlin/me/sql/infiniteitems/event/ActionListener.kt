@@ -1,11 +1,14 @@
 package me.sql.infiniteitems.event
 
+import com.destroystokyo.paper.event.player.PlayerJumpEvent
 import me.sql.infiniteitems.item.CustomItemRegistry
-import me.sql.infiniteitems.item.action.ItemDropAction
-import me.sql.infiniteitems.item.action.RightClickAction
+import me.sql.infiniteitems.item.action.type.*
+import org.bukkit.entity.Animals
+import org.bukkit.entity.Monster
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
@@ -33,6 +36,29 @@ class ActionListener : Listener {
     fun onItemDrop(event: PlayerDropItemEvent) {
         val customItem = CustomItemRegistry.get(event.itemDrop.itemStack) ?: return
         val action = ItemDropAction(event.player)
+        customItem.handleAction(action)
+    }
+
+    @EventHandler
+    fun onPlayerHit(event: EntityDamageByEntityEvent) {
+        if(event.damager !is Player) return
+        val customItem = CustomItemRegistry.get((event.damager as Player).inventory.itemInMainHand) ?: return
+        val hitEntityAction = HitEntityAction(event.damager as Player, event.entity)
+        customItem.handleAction(hitEntityAction)
+
+        val specificAction = when(event.entity) {
+            is Monster -> HitMobAction(event.damager as Player, event.entity as Monster)
+            is Animals -> HitAnimalAction(event.damager as Player, event.entity as Animals)
+            is Player -> HitPlayerAction(event.damager as Player, event.entity as Player)
+            else -> return
+        }
+        customItem.handleAction(specificAction)
+    }
+
+    @EventHandler
+    fun onPlayerJump(event: PlayerJumpEvent) {
+        val customItem = CustomItemRegistry.get(event.player.inventory.itemInMainHand) ?: return
+        val action = JumpAction(event.player)
         customItem.handleAction(action)
     }
 

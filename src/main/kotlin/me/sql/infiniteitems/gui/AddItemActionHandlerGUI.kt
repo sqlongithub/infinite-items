@@ -60,7 +60,7 @@ class AddItemActionHandlerGUI(private val player: Player,
                 this.actionHandler.type = type as ActionType
                 this.show()
             }, { player ->
-                AddItemActionHandlerGUI(player, this.item).show()
+                AddItemActionHandlerGUI(player, this.item, this.actionHandler).show()
             }, "Execute when ", this.actionHandler.type).show()
         }
     }

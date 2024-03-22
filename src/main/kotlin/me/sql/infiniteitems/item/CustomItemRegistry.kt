@@ -3,10 +3,8 @@ package me.sql.infiniteitems.item
 import me.sql.infiniteitems.InfiniteItems
 import org.bukkit.Bukkit
 import org.bukkit.Material
-import org.bukkit.NamespacedKey
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
-import org.bukkit.persistence.PersistentDataType
 
 class CustomItemRegistry {
 
@@ -55,6 +53,9 @@ class CustomItemRegistry {
             var customItem: CustomItem? = null
             val nbt = CraftItemStack.asNMSCopy(item).tag
             if(nbt != null) {
+                if(InfiniteItems.debugging) {
+                    Bukkit.getLogger().info("get(): nbt not null")
+                }
                 customItem = get(nbt.getString(IDENTIFIER_TAG))
             }
             return customItem

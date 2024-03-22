@@ -3,11 +3,9 @@ package me.sql.infiniteitems.gui
 import com.destroystokyo.paper.profile.ProfileProperty
 import com.github.stefvanschie.inventoryframework.gui.GuiItem
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui
-import com.github.stefvanschie.inventoryframework.gui.type.util.Gui
 import com.github.stefvanschie.inventoryframework.pane.OutlinePane
 import com.github.stefvanschie.inventoryframework.pane.StaticPane
 import me.sql.infiniteitems.item.CustomItem
-import me.sql.infiniteitems.item.action.Action
 import me.sql.infiniteitems.item.action.handler.ActionHandler
 import me.sql.infiniteitems.item.action.operation.Operation
 import me.sql.infiniteitems.item.action.operation.OperationType
@@ -18,17 +16,15 @@ import me.sql.infiniteitems.util.asTextComponent
 import me.sql.infiniteitems.util.getBackgroundPane
 import me.sql.infiniteitems.util.withoutItalics
 import net.kyori.adventure.text.TextComponent
-import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.reflect.KClass
 
-class ConfigureOperationGUI(val item: CustomItem, private val actionHandler: ActionHandler<Action>) {
+class ConfigureOperationGUI(val item: CustomItem, private val actionHandler: ActionHandler) {
 
     private val actionHandlerDraft = actionHandler
 
