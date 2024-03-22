@@ -22,6 +22,8 @@ import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import java.util.*
+import kotlin.collections.ArrayList
 
 class AddItemActionHandlerGUI(private val player: Player,
                               private val item: CustomItem,
@@ -154,8 +156,7 @@ class AddItemActionHandlerGUI(private val player: Player,
         val lore  = ArrayList<TextComponent>()
         lore.add("§7Current: §a${actionHandler.operation.description}")
         for(operationData in actionHandler.operation.data) {
-            if(operationData != null)
-                lore.add("  §8 - $operationData")
+            lore.add("  §8 - ${operationData.toString(player)}")
         }
         lore.add("")
         lore.add("§7This is what will happen when the selected §aAction§7")
@@ -207,7 +208,7 @@ class AddItemActionHandlerGUI(private val player: Player,
             lore.add("  §7 - §a${actionHandler.condition.description}")
         }
         lore.add("§7then")
-        lore.add("  §7 - §a${actionHandler.operation.description}")
+        lore.add("  §7 - §a${actionHandler.operation.description.replaceFirstChar { it.lowercase(Locale.getDefault()) }}")
 
         meta.lore(lore)
 

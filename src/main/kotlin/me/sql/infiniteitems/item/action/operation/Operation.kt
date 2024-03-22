@@ -7,7 +7,7 @@ interface Operation {
     val type: OperationType
     val name: String
     val description: String
-    val data: List<OperationData?>
+    val data: List<OperationData>
     fun execute()
 
 }
