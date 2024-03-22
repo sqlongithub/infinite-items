@@ -4,9 +4,10 @@ import me.sql.infiniteitems.InfiniteItems
 import me.sql.infiniteitems.event.ActionListener
 import me.sql.infiniteitems.item.CustomItem
 import me.sql.infiniteitems.item.CustomItemRegistry
+import me.sql.infiniteitems.item.action.ActionType
 import me.sql.infiniteitems.item.action.RightClickAction
 import me.sql.infiniteitems.item.action.condition.NoneCondition
-import me.sql.infiniteitems.item.action.handler.RightClickActionHandler
+import me.sql.infiniteitems.item.action.handler.ActionHandler
 import me.sql.infiniteitems.item.action.operation.SendMessageOperation
 import me.sql.infiniteitems.item.action.operation.data.MessageOperationData
 import me.sql.infiniteitems.item.action.operation.data.PlayersOperationData
@@ -16,7 +17,6 @@ import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack
 import org.bukkit.entity.Player
-import org.bukkit.persistence.PersistentDataType
 import kotlin.test.*
 
 class CustomItemTest {
@@ -60,7 +60,7 @@ class CustomItemTest {
              return@MessageOperationData "test".asTextComponent()
          }
          val operation = SendMessageOperation(message, players)
-         val handler = RightClickActionHandler(operation, NoneCondition())
+         val handler = ActionHandler(ActionType.RIGHT_CLICK, operation, NoneCondition())
 
          customItem.actionHandlers.add(handler)
 

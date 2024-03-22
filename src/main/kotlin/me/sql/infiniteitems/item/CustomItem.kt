@@ -20,7 +20,7 @@ class CustomItem(
     actualName: TextComponent = Component.text("&aCustom Item"),
     var material: Material = Material.STICK,
     var maxStackSize: Int = material.maxStackSize,
-    actionHandlers: ArrayList<ActionHandler<Action>> = ArrayList()
+    actionHandlers: ArrayList<ActionHandler> = ArrayList()
 ) {
 
     init {
@@ -34,7 +34,7 @@ class CustomItem(
             actualName = value.withoutItalics().color(NamedTextColor.WHITE)
         }
 
-    var actionHandlers: ArrayList<ActionHandler<Action>> = actionHandlers
+    var actionHandlers: ArrayList<ActionHandler> = actionHandlers
         private set
 
     fun getItemStack(player: Player): ItemStack {
