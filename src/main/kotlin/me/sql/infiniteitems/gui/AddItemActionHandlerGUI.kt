@@ -5,14 +5,10 @@ import com.github.stefvanschie.inventoryframework.gui.type.ChestGui
 import com.github.stefvanschie.inventoryframework.pane.OutlinePane
 import com.github.stefvanschie.inventoryframework.pane.StaticPane
 import me.sql.infiniteitems.item.CustomItem
-import me.sql.infiniteitems.item.action.Action
 import me.sql.infiniteitems.item.action.ActionType
-import me.sql.infiniteitems.item.action.condition.Condition
 import me.sql.infiniteitems.item.action.condition.NoneCondition
 import me.sql.infiniteitems.item.action.handler.ActionHandler
-import me.sql.infiniteitems.item.action.handler.RightClickActionHandler
 import me.sql.infiniteitems.item.action.operation.NoneOperation
-import me.sql.infiniteitems.item.action.operation.Operation
 import me.sql.infiniteitems.util.add
 import me.sql.infiniteitems.util.asTextComponent
 import me.sql.infiniteitems.util.getBackgroundPane
@@ -23,11 +19,10 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.*
-import kotlin.collections.ArrayList
 
 class AddItemActionHandlerGUI(private val player: Player,
                               private val item: CustomItem,
-                              var actionHandler: ActionHandler<Action> = RightClickActionHandler(
+                              var actionHandler: ActionHandler = ActionHandler(ActionType.RIGHT_CLICK,
                                   NoneOperation(),
                                   NoneCondition()
                               )) {
@@ -62,9 +57,7 @@ class AddItemActionHandlerGUI(private val player: Player,
 
         return GuiItem(item) { click ->
             SelectSelectableGUI("Selecting Action Type", player, ActionType.entries, { type ->
-                this.actionHandler = (type as ActionType).handlerClass.java
-                    .getDeclaredConstructor(Operation::class.java, Condition::class.java)
-                    .newInstance(actionHandler.operation, actionHandler.condition)
+                this.actionHandler.type = type as ActionType
                 this.show()
             }, { player ->
                 AddItemActionHandlerGUI(player, this.item).show()

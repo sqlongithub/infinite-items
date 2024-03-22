@@ -5,11 +5,10 @@ import me.sql.infiniteitems.item.action.ActionType
 import me.sql.infiniteitems.item.action.condition.Condition
 import me.sql.infiniteitems.item.action.operation.Operation
 
-interface ActionHandler<out T : Action> {
+class ActionHandler(var type: ActionType, var operation: Operation, var condition: Condition) {
 
-    val type: ActionType
-    var condition: Condition
-    var operation: Operation
-    fun handle(action: @UnsafeVariance T)
+    fun handle(action: Action) {
+        operation.execute(action.player)
+    }
 
 }
