@@ -1,7 +1,8 @@
 package me.sql.infiniteitems.item.action.operation
 
+import me.sql.infiniteitems.item.action.Action
+import me.sql.infiniteitems.item.action.ActionType
 import me.sql.infiniteitems.item.action.operation.data.OperationData
-import org.bukkit.entity.Player
 
 class NoneOperation : Operation {
 
@@ -10,8 +11,12 @@ class NoneOperation : Operation {
     override val description = "do nothing"
     override val data: List<OperationData> = emptyList()
 
-    override fun execute(player: Player) {
+    override fun execute(action: Action) {
         return
+    }
+
+    override fun forActionType(actionType: ActionType): Operation {
+        return this
     }
 
 

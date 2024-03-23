@@ -51,7 +51,6 @@ class SelectMaterialGUI(val player: Player, private val onSelect: Consumer<Mater
         val numPages: Int = ceil(itemsToDisplay.size.toDouble() / itemsPerPage.toDouble()).toInt()
         Bukkit.getLogger().info("items: ${itemsToDisplay.size}, per page: ${itemsPerPage}, numpages: ${numPages}")
         for(i in 0 until numPages) {
-            Bukkit.getLogger().info("page $i")
             val pagePane = OutlinePane(0, 0, 9, rows - 1)
             for(j in 0 until itemsPerPage) {
                 if(itemsToDisplay.isEmpty()) break

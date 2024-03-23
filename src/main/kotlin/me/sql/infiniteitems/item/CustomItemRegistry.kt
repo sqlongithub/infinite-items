@@ -53,7 +53,7 @@ class CustomItemRegistry {
             var customItem: CustomItem? = null
             val nbt = CraftItemStack.asNMSCopy(item).tag
             if(nbt != null) {
-                if(InfiniteItems.debugging) {
+                if(InfiniteItems.DEBUGGING) {
                     Bukkit.getLogger().info("get(): nbt not null")
                 }
                 customItem = get(nbt.getString(ALIAS_TAG))

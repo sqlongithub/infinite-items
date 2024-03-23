@@ -7,6 +7,7 @@ import com.github.stefvanschie.inventoryframework.pane.OutlinePane
 import com.github.stefvanschie.inventoryframework.pane.Pane
 import com.github.stefvanschie.inventoryframework.pane.StaticPane
 import me.sql.infiniteitems.InfiniteItems
+import me.sql.infiniteitems.item.action.Action
 import me.sql.infiniteitems.util.add
 import me.sql.infiniteitems.util.asTextComponent
 import me.sql.infiniteitems.util.getBackgroundPane
@@ -18,12 +19,14 @@ import org.bukkit.Material
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.SkullMeta
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.scheduler.BukkitTask
+import org.w3c.dom.Text
 import java.util.function.Consumer
 
-class PlayersOperationData(
+open class PlayersOperationData(
     var isAll: Boolean, var isUser: Boolean,
     private var players: ArrayList<OfflinePlayer> = ArrayList()
 ) : OperationData {
@@ -32,36 +35,56 @@ class PlayersOperationData(
     override val description = "These are the players the operation applies to."
     override val material = Material.PLAYER_HEAD
 
+    protected var togglesPane = OutlinePane(3, 0, 3, 1)
+    protected var gui = ChestGui(6, "Selecting Players")
+
+    private var isAllItem = ItemStack(if(isAll) { Material.LIME_DYE } else { Material.GRAY_DYE })
+    private var isAllMeta = isAllItem.itemMeta!!
+    private var isAllLore = ArrayList<TextComponent>()
+
+    private var thePlayerItem = ItemStack(if(isUser) { Material.LIME_DYE } else { Material.GRAY_DYE })
+    private var thePlayerMeta = thePlayerItem.itemMeta!!
+    private var thePlayerLore = ArrayList<TextComponent>()
+
+    protected var playersPane = OutlinePane(1, 1, 7, 4)
+
+    init {
+        if(isAll) isUser = false
+    }
+
+    protected open fun updateGui() {
+        isAllItem.type = if(isAll) { Material.LIME_DYE } else { Material.GRAY_DYE }
+        // should this be currently instead of current?
+        isAllLore[0] = ("§7Current: " + if(isAll) { "§aYes" } else { "§cNo" }).asTextComponent()
+        isAllMeta.lore(isAllLore)
+        isAllItem.itemMeta = isAllMeta
+
+        thePlayerItem.type = if(isUser) { Material.LIME_DYE } else { Material.GRAY_DYE }
+        thePlayerLore[0] = ("§7Current: " + if(isUser) { "§aYes" } else { "§cNo" }).asTextComponent()
+        thePlayerMeta.lore(thePlayerLore)
+        thePlayerItem.itemMeta = thePlayerMeta
+
+    }
+
     // TODO: this code needs cleaning
     override fun showConfigurationGUI(player: Player, onReturn: Consumer<in OperationData>) {
-        val gui = ChestGui(6, "Selecting Players")
+        gui = ChestGui(6, "Selecting Players")
+        togglesPane = OutlinePane(3, 0, 3, 1)
+        // this is all so bad ugghhghghgh
+        isAllItem = ItemStack(if(isAll) { Material.LIME_DYE } else { Material.GRAY_DYE })
+        isAllMeta = isAllItem.itemMeta!!
+        isAllLore = ArrayList<TextComponent>()
+
+        thePlayerItem = ItemStack(if(isUser) { Material.LIME_DYE } else { Material.GRAY_DYE })
+        thePlayerMeta = thePlayerItem.itemMeta!!
+        thePlayerLore = ArrayList<TextComponent>()
+
         gui.addPane(getBackgroundPane(6))
         gui.setOnTopClick { click ->
             click.isCancelled = true
         }
 
-        val togglesPane = OutlinePane(3, 0, 3, 1)
         togglesPane.gap = 1
-        val isAllItem = ItemStack(if(isAll) { Material.LIME_DYE } else { Material.GRAY_DYE })
-        val isAllMeta = isAllItem.itemMeta!!
-        val isAllLore = ArrayList<TextComponent>()
-
-        val thePlayerItem = ItemStack(if(isUser) { Material.LIME_DYE } else { Material.GRAY_DYE })
-        val thePlayerMeta = thePlayerItem.itemMeta!!
-        val thePlayerLore = ArrayList<TextComponent>()
-
-        val updateGui = {
-            isAllItem.type = if(isAll) { Material.LIME_DYE } else { Material.GRAY_DYE }
-            // should this be currently instead of current?
-            isAllLore[0] = ("§7Current: " + if(isAll) { "§aYes" } else { "§cNo" }).asTextComponent()
-            isAllMeta.lore(isAllLore)
-            isAllItem.itemMeta = isAllMeta
-
-            thePlayerItem.type = if(isUser) { Material.LIME_DYE } else { Material.GRAY_DYE }
-            thePlayerLore[0] = ("§7Current: " + if(isUser) { "§aYes" } else { "§cNo" }).asTextComponent()
-            thePlayerMeta.lore(thePlayerLore)
-            thePlayerItem.itemMeta = thePlayerMeta
-        }
 
         isAllMeta.displayName("§aEveryone".asTextComponent().withoutItalics())
         isAllLore.add("§7Current: " + if(isAll) { "§aEveryone" } else { "§cNo" })
@@ -70,7 +93,7 @@ class PlayersOperationData(
         isAllMeta.lore(isAllLore)
         isAllItem.itemMeta = isAllMeta
 
-        val playersPane = OutlinePane(1, 1, 7, 4)
+        playersPane = OutlinePane(1, 1, 7, 4)
         playersPane.priority = Pane.Priority.HIGH
         if(isAll || isUser) playersPane.isVisible = false
         gui.addPane(playersPane)
@@ -210,15 +233,19 @@ class PlayersOperationData(
         return ("to: §a${getFormattedValue(player)}")
     }
 
-    fun getOnlinePlayers(player: Player): List<Player> = when(isAll) {
+    open fun getOnlinePlayers(action: Action): List<Player> = when(isAll) {
         true -> Bukkit.getOnlinePlayers().toList()
         else -> when(isUser) {
-            true -> listOf(player)
+            true -> listOf(action.player)
             else -> players.filterIsInstance<Player>()
         }
-
     }
 
-    fun getPlayers(): List<OfflinePlayer> = players
+    fun getPlayers(action: Action?): List<OfflinePlayer> {
+        val allPlayers = ArrayList(players)
+        if(action != null)
+            allPlayers.addAll(getOnlinePlayers(action))
+        return allPlayers.toList()
+    }
 
 }

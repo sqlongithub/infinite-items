@@ -9,6 +9,7 @@ import me.sql.infiniteitems.item.action.ActionType
 import me.sql.infiniteitems.item.action.condition.NoneCondition
 import me.sql.infiniteitems.item.action.handler.ActionHandler
 import me.sql.infiniteitems.item.action.operation.NoneOperation
+import me.sql.infiniteitems.item.action.operation.Operation
 import me.sql.infiniteitems.util.add
 import me.sql.infiniteitems.util.asTextComponent
 import me.sql.infiniteitems.util.getBackgroundPane
@@ -20,6 +21,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.*
 import java.util.function.Consumer
+import kotlin.reflect.KClass
 
 class AddItemActionHandlerGUI(
     private val player: Player,
@@ -62,6 +64,7 @@ class AddItemActionHandlerGUI(
         return GuiItem(item) { click ->
             SelectSelectableGUI("Selecting Action Type", player, ActionType.entries, { type ->
                 this.actionHandler.type = type as ActionType
+                this.actionHandler.operation = this.actionHandler.operation.forActionType(type)
                 this.show()
             }, { player ->
                 AddItemActionHandlerGUI(player, this.item, this.actionHandler, onReturn).show()

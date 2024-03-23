@@ -3,6 +3,7 @@ package me.sql.infiniteitems.gui
 import com.github.stefvanschie.inventoryframework.gui.GuiItem
 import com.github.stefvanschie.inventoryframework.gui.type.AnvilGui
 import com.github.stefvanschie.inventoryframework.pane.StaticPane
+import me.sql.infiniteitems.InfiniteItems
 import me.sql.infiniteitems.util.withoutItalics
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
@@ -12,6 +13,8 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
+import org.bukkit.scheduler.BukkitRunnable
+import org.bukkit.scheduler.BukkitTask
 import java.util.function.Consumer
 
 class AnvilInputGUI(
@@ -38,6 +41,7 @@ class AnvilInputGUI(
     private val secondItem: GuiItem = GuiItem(ItemStack(Material.ANVIL))
     private val resultItem: GuiItem = GuiItem(ItemStack(Material.AIR))
     private val anvilGui = AnvilGui(title)
+    private var updateTask: BukkitTask? = null
 
 
     init {
@@ -58,7 +62,13 @@ class AnvilInputGUI(
             meta.displayName(Component.text(ChatColor.translateAlternateColorCodes('&', name)).withoutItalics().color(NamedTextColor.WHITE))
             item.itemMeta = meta
             resultItem.item = item
-            anvilGui.update()
+
+            updateTask?.cancel()
+            updateTask = object : BukkitRunnable() {
+                override fun run() {
+                    anvilGui.update()
+                }
+            }.runTaskLater(InfiniteItems.instance, 5L)
         }
         anvilGui.firstItemComponent.addPane(firstItemPane)
         anvilGui.secondItemComponent.addPane(secondItemPane)

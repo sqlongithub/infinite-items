@@ -10,5 +10,6 @@ enum class OperationType(override val parentClass: KClass<*>,
 
     NONE(NoneOperation::class, Material.BARRIER, "Do nothing"),
     SEND_MESSAGE(SendMessageOperation::class, Material.WRITABLE_BOOK, "Send a message"),
+    BAN_PLAYER(BanPlayerOperation::class, Material.LAVA_BUCKET, "Ban a player")
 
 }

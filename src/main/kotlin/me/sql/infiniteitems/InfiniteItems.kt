@@ -10,7 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin
 open class InfiniteItems : JavaPlugin() {
 
     companion object {
-        val debugging: Boolean = false
+        const val DEBUGGING: Boolean = true
         lateinit var instance: JavaPlugin
         lateinit var commandManager: PaperCommandManager
     }

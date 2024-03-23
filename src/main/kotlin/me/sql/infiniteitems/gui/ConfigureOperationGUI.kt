@@ -6,6 +6,7 @@ import com.github.stefvanschie.inventoryframework.gui.type.ChestGui
 import com.github.stefvanschie.inventoryframework.pane.OutlinePane
 import com.github.stefvanschie.inventoryframework.pane.StaticPane
 import me.sql.infiniteitems.item.CustomItem
+import me.sql.infiniteitems.item.action.ActionType
 import me.sql.infiniteitems.item.action.handler.ActionHandler
 import me.sql.infiniteitems.item.action.operation.Operation
 import me.sql.infiniteitems.item.action.operation.OperationType
@@ -52,7 +53,7 @@ class ConfigureOperationGUI(val item: CustomItem, private val actionHandler: Act
                     return@SelectSelectableGUI
                 }
                 this.actionHandlerDraft.operation =
-                    (type.parentClass as KClass<Operation>).java.getDeclaredConstructor().newInstance()
+                    (type.parentClass as KClass<Operation>).java.getDeclaredConstructor(ActionType::class.java).newInstance(actionHandler.type)
                 ConfigureOperationGUI(this.item, this.actionHandlerDraft, onReturn).show(player)
             }, { player ->
                 ConfigureOperationGUI(this.item, this.actionHandlerDraft, onReturn).show(player)
@@ -67,8 +68,8 @@ class ConfigureOperationGUI(val item: CustomItem, private val actionHandler: Act
         meta.displayName("§a${data.name}".asTextComponent().withoutItalics())
 
         if(data is PlayersOperationData) {
-            if(data.getPlayers().isNotEmpty())
-                (meta as SkullMeta).owningPlayer = data.getPlayers()[0]
+            if(data.getPlayers(null).isNotEmpty())
+                (meta as SkullMeta).owningPlayer = data.getPlayers(null)[0]
             else
                 if(data.isAll)
                     (meta as SkullMeta).owningPlayer = player
@@ -80,7 +81,6 @@ class ConfigureOperationGUI(val item: CustomItem, private val actionHandler: Act
         }
 
         val lore = ArrayList<TextComponent>()
-        Bukkit.getLogger().info(data.getFormattedValue(player))
         lore.add("§7Current: §a${data.getFormattedValue(player)}")
         lore.add("§7${data.description}")
         lore.add("")

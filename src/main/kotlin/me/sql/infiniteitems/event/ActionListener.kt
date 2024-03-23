@@ -1,8 +1,10 @@
 package me.sql.infiniteitems.event
 
 import com.destroystokyo.paper.event.player.PlayerJumpEvent
+import me.sql.infiniteitems.InfiniteItems
 import me.sql.infiniteitems.item.CustomItemRegistry
 import me.sql.infiniteitems.item.action.type.*
+import org.bukkit.Bukkit
 import org.bukkit.entity.Animals
 import org.bukkit.entity.Monster
 import org.bukkit.entity.Player
@@ -42,7 +44,13 @@ class ActionListener : Listener {
     @EventHandler
     fun onPlayerHit(event: EntityDamageByEntityEvent) {
         if(event.damager !is Player) return
-        val customItem = CustomItemRegistry.get((event.damager as Player).inventory.itemInMainHand) ?: return
+        val customItem = CustomItemRegistry.get((event.damager as Player).inventory.itemInMainHand)
+        if(customItem == null) {
+            if(InfiniteItems.DEBUGGING) {
+                Bukkit.getLogger().info("invalid custom item")
+            }
+            return
+        }
         val hitEntityAction = HitEntityAction(event.damager as Player, event.entity)
         customItem.handleAction(hitEntityAction)
 
@@ -51,6 +59,12 @@ class ActionListener : Listener {
             is Animals -> HitAnimalAction(event.damager as Player, event.entity as Animals)
             is Player -> HitPlayerAction(event.damager as Player, event.entity as Player)
             else -> return
+        }
+        if(InfiniteItems.DEBUGGING) {
+            Bukkit.getLogger().info("player hit entity ")
+            Bukkit.getLogger().info("is monster: " + (event.entity is Monster))
+            Bukkit.getLogger().info("is animal: " + (event.entity is Animals))
+            Bukkit.getLogger().info("is player: " + (event.entity is Player))
         }
         customItem.handleAction(specificAction)
     }

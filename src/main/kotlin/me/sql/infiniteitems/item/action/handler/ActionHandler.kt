@@ -8,7 +8,7 @@ import me.sql.infiniteitems.item.action.operation.Operation
 class ActionHandler(var type: ActionType, var operation: Operation, var condition: Condition) {
 
     fun handle(action: Action) {
-        operation.execute(action.player)
+        operation.execute(action)
     }
 
 }

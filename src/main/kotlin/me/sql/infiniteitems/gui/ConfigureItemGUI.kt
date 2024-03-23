@@ -186,8 +186,8 @@ class ConfigureItemGUI(
             gui.addPane(finishActionsPane)
             gui.show(player)
         }
-        if(InfiniteItems.debugging) {
-            player.sendMessage(Component.text((measureTime(showGui).inWholeMicroseconds * 1000f).toString() + " ms"))
+        if(InfiniteItems.DEBUGGING) {
+            player.sendMessage(Component.text((measureTime(showGui).inWholeMicroseconds / 1000f).toString() + " ms"))
         } else {
             showGui()
         }

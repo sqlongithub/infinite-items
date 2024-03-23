@@ -66,7 +66,7 @@ class CustomItemTest {
 
          val player = server.addPlayer("jens")
          customItem.handleAction(RightClickAction(player))
-         if(InfiniteItems.debugging)
+         if(InfiniteItems.DEBUGGING)
              assertEquals("action handled", player.nextMessage())
          assertEquals("test", player.nextMessage())
      }
