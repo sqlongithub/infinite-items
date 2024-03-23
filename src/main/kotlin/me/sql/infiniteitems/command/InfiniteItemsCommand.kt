@@ -7,6 +7,7 @@ import co.aikar.commands.bukkit.contexts.OnlinePlayer
 import me.sql.infiniteitems.gui.CreateItemGUI
 import me.sql.infiniteitems.item.CustomItem
 import me.sql.infiniteitems.item.CustomItemRegistry
+import me.sql.infiniteitems.util.asTextComponent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
@@ -22,23 +23,28 @@ class InfiniteItemsCommand : BaseCommand() {
     fun onHelp(sender: CommandSender, help: CommandHelp) {
         sender.sendMessage(Component.text("InfiniteItems - Help").color(NamedTextColor.GOLD))
         for(helpEntry in help.helpEntries) {
-            sender.sendMessage(Component.text("§a/${helpEntry.command} ${helpEntry.parameterSyntax}  §7- ${helpEntry.description}"))
+            var message = "§a/${helpEntry.command}"
+            if(helpEntry.parameterSyntax.isNotBlank()) {
+                message += " ${helpEntry.parameterSyntax}"
+            }
+            message += "  §7- ${helpEntry.description}"
+            sender.sendMessage(message.asTextComponent())
         }
     }
 
     @Subcommand("create|new|make|c|n|m")
     @Description("Create a new custom item")
-    fun onCreateItem(player: Player, vararg identifier: String) {
+    fun onCreateItem(player: Player, vararg alias: String) {
         lateinit var customItem: CustomItem
-        if(identifier.isNotEmpty()) {
-            val identifierString = identifier.joinToString(" ").lowercase().replace(" ", "_")
-            if(CustomItemRegistry.isRegistered(identifierString)) {
-                player.sendMessage("§cAn item with the identifier $identifierString already exists!")
+        if(alias.isNotEmpty()) {
+            val aliasString = alias.joinToString(" ").lowercase().replace(" ", "_")
+            if(CustomItemRegistry.isRegistered(aliasString)) {
+                player.sendMessage("§cAn item with the alias $aliasString already exists!")
                 return
             }
-            customItem = CustomItem(identifierString)
+            customItem = CustomItem(aliasString)
         } else {
-            player.sendMessage("§cYou need to specify an identifier. Example: §a/ii c item1")
+            player.sendMessage("§cYou need to specify an alias. Example: §a/ii c item1")
             return
         }
         if(player.inventory.itemInMainHand.type != Material.AIR) {
@@ -52,11 +58,11 @@ class InfiniteItemsCommand : BaseCommand() {
     @Subcommand("give|g|get")
     @Description("Give a player a custom item")
     @CommandCompletion("@players @custom_items")
-    fun onGiveCustomItem(sender: CommandSender, to: OnlinePlayer, vararg identifier: String) {
-        val stringIdentifier = identifier.joinToString(" ").lowercase().replace(" ", "_")
-        val customItem = CustomItemRegistry.get(stringIdentifier)
+    fun onGiveCustomItem(sender: CommandSender, to: OnlinePlayer, vararg item: String) {
+        val stringAlias = item.joinToString(" ").lowercase().replace(" ", "_")
+        val customItem = CustomItemRegistry.get(stringAlias)
         if(customItem == null) {
-            sender.sendMessage("§c§r${stringIdentifier}§c is not a valid custom item! Run §a/ii list§c for a list of valid items.")
+            sender.sendMessage("§c§r${stringAlias}§c is not a valid custom item! Run §a/ii list§c for a list of valid items.")
             return
         }
         val didntFit = to.player.inventory.addItem(customItem.getItemStack(to.player))
@@ -64,7 +70,7 @@ class InfiniteItemsCommand : BaseCommand() {
             sender.sendMessage("§cCouldn't give item to ${to.player.name} as their inventory is full.")
             return
         }
-        sender.sendMessage("§aSuccessfully gave §r${stringIdentifier}§a to ${to.player.name}!")
+        sender.sendMessage("§aSuccessfully gave §r${stringAlias}§a to ${to.player.name}!")
     }
 
     @Subcommand("list|l|listall|ls|listitems|items|customitems")
@@ -75,8 +81,8 @@ class InfiniteItemsCommand : BaseCommand() {
             return
         }
         sender.sendMessage("§aAll custom items:")
-        for(identifier in CustomItemRegistry.registeredIdentifiers) {
-            sender.sendMessage("  §7- §r${identifier}")
+        for(alias in CustomItemRegistry.registeredAliases) {
+            sender.sendMessage("  §7- §r${alias}")
         }
     }
 

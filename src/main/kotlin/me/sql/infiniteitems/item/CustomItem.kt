@@ -13,10 +13,9 @@ import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.bukkit.persistence.PersistentDataType
 
 class CustomItem(
-    var identifier: String = "custom_item-" + (CustomItemRegistry.size + 1),
+    var alias: String = "custom_item-" + (CustomItemRegistry.size + 1),
     actualName: TextComponent = Component.text("&aCustom Item"),
     var material: Material = Material.STICK,
     var maxStackSize: Int = material.maxStackSize,
@@ -24,7 +23,7 @@ class CustomItem(
 ) {
 
     init {
-        identifier = identifier.lowercase().replace(" ", "_")
+        alias = alias.lowercase().replace(" ", "_")
     }
 
     private var actualName: TextComponent = actualName.withoutItalics().color(NamedTextColor.WHITE)
@@ -42,7 +41,7 @@ class CustomItem(
 
         val nmsItem = CraftItemStack.asNMSCopy(itemStack)
         val tag = CompoundTag()
-        tag.putString(CustomItemRegistry.IDENTIFIER_TAG, identifier)
+        tag.putString(CustomItemRegistry.ALIAS_TAG, alias)
         nmsItem.tag = tag
 
         itemStack = nmsItem.asBukkitMirror()

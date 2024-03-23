@@ -37,7 +37,7 @@ class CustomItemTest {
 
         val customItem = CustomItem("custom item", "§cSuper§aCool§9Item".asTextComponent(), Material.DIRT, 64)
 
-        assertEquals("custom_item", customItem.identifier)
+        assertEquals("custom_item", customItem.alias)
         assertEquals("§cSuper§aCool§9Item".asTextComponent().color(NamedTextColor.WHITE).withoutItalics(), customItem.name)
 
         val player = server.addPlayer("jens")
@@ -47,7 +47,7 @@ class CustomItemTest {
         assertEquals(customItem.name, itemStack.itemMeta.displayName())
         val nms = CraftItemStack.asNMSCopy(itemStack)
         assert(nms.hasTag())
-        assertEquals(customItem.identifier, nms.tag!!.getString(CustomItemRegistry.IDENTIFIER_TAG))
+        assertEquals(customItem.alias, nms.tag!!.getString(CustomItemRegistry.ALIAS_TAG))
 
     }
 

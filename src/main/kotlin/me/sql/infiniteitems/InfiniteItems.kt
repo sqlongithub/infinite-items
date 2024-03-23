@@ -21,7 +21,7 @@ open class InfiniteItems : JavaPlugin() {
         commandManager = PaperCommandManager(this)
         commandManager.enableUnstableAPI("help")
         commandManager.commandCompletions.registerAsyncCompletion("custom_items") { c ->
-            CustomItemRegistry.registeredIdentifiers
+            CustomItemRegistry.registeredAliases
         }
         commandManager.registerCommand(InfiniteItemsCommand())
 

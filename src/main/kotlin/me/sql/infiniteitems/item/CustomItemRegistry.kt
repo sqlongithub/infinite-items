@@ -10,38 +10,38 @@ class CustomItemRegistry {
 
     companion object {
 
-        val IDENTIFIER_TAG = "infiniteitems_custom_item_identifier"
+        const val ALIAS_TAG = "infiniteitems_custom_item_alias"
         private val registry = mutableMapOf<String, CustomItem>()
         val size
             get() = registry.size
         val registeredItems
             get() = registry.values.toList()
-        val registeredIdentifiers
+        val registeredAliases
             get() = registry.keys.toList()
 
         fun register(customItem: CustomItem) {
-            if(registry.containsKey(customItem.identifier)) {
-                Bukkit.getLogger().warning("Custom item already registered: ${customItem.identifier}")
+            if(registry.containsKey(customItem.alias)) {
+                Bukkit.getLogger().warning("Custom item already registered: ${customItem.alias}")
                 return
             }
-            registry[customItem.identifier] = customItem
+            registry[customItem.alias] = customItem
         }
 
-        fun isRegistered(identifier: String?): Boolean = registry.containsKey(identifier)
+        fun isRegistered(alias: String?): Boolean = registry.containsKey(alias)
 
-        fun get(identifier: String?): CustomItem? {
-            if(identifier == null)
+        fun get(alias: String?): CustomItem? {
+            if(alias == null)
                 return null
-            val identifier = identifier.lowercase().replace(' ', '_')
-            if (!registry.containsKey(identifier.lowercase().replace(' ', '_'))) {
-                Bukkit.getLogger().severe("Custom item not found: $identifier")
+            val alias = alias.lowercase().replace(' ', '_')
+            if (!registry.containsKey(alias.lowercase().replace(' ', '_'))) {
+                Bukkit.getLogger().severe("Custom item not found: $alias")
                 Bukkit.getLogger().severe("Registered items: ${registry.keys}")
                 return null
             }
-            if(registry[identifier]?.identifier  != identifier) {
-                Bukkit.getLogger().severe("Custom item is registered with different identifier: $identifier / ${registry[identifier]?.identifier}")
+            if(registry[alias]?.alias  != alias) {
+                Bukkit.getLogger().severe("Custom item is registered under a different name: $alias / ${registry[alias]?.alias}")
             }
-            return registry[identifier]
+            return registry[alias]
         }
 
         fun get(item: ItemStack?): CustomItem? {
@@ -56,7 +56,7 @@ class CustomItemRegistry {
                 if(InfiniteItems.debugging) {
                     Bukkit.getLogger().info("get(): nbt not null")
                 }
-                customItem = get(nbt.getString(IDENTIFIER_TAG))
+                customItem = get(nbt.getString(ALIAS_TAG))
             }
             return customItem
         }

@@ -149,7 +149,7 @@ class CreateItemGUI(private val customItem: CustomItem, val player: Player) {
             customItem.create()
             player.inventory.addItem(customItem.getItemStack(player))
             player.closeInventory()
-            player.sendMessage("§aSuccessfully created custom item §r${customItem.identifier}§a!")
+            player.sendMessage("§aSuccessfully created custom item §r${customItem.alias}§a!")
         }
     }
 
