@@ -16,9 +16,11 @@ import me.sql.infiniteitems.util.withoutItalics
 import net.kyori.adventure.text.TextComponent
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
+import java.util.function.Consumer
 
-class ConfigureItemActionsGUI(private val item: CustomItem) {
+class ConfigureItemActionsGUI(private val item: CustomItem, private val onReturn: Consumer<Player>) {
 
     private fun getReturnItem(): GuiItem {
         val item = ItemStack(Material.ARROW)
@@ -27,7 +29,7 @@ class ConfigureItemActionsGUI(private val item: CustomItem) {
         meta.displayName("§aBack".asTextComponent().withoutItalics())
         item.itemMeta = meta
         return GuiItem(item) { click ->
-            CreateItemGUI(this.item, click.whoClicked as Player).show()
+            onReturn.accept(click.whoClicked as Player)
         }
     }
 
@@ -70,7 +72,7 @@ class ConfigureItemActionsGUI(private val item: CustomItem) {
         item.itemMeta = meta
         return GuiItem(item) { click ->
             // TODO: add handler
-            AddItemActionHandlerGUI(click.whoClicked as Player, this.item).show()
+            AddItemActionHandlerGUI(click.whoClicked as Player, this.item, onReturn = onReturn).show()
         }
     }
 

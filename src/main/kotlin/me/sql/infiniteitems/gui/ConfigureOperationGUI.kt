@@ -22,9 +22,10 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
 import java.util.*
+import java.util.function.Consumer
 import kotlin.reflect.KClass
 
-class ConfigureOperationGUI(val item: CustomItem, private val actionHandler: ActionHandler) {
+class ConfigureOperationGUI(val item: CustomItem, private val actionHandler: ActionHandler, private val onReturn: Consumer<Player>) {
 
     private val actionHandlerDraft = actionHandler
 
@@ -52,9 +53,9 @@ class ConfigureOperationGUI(val item: CustomItem, private val actionHandler: Act
                 }
                 this.actionHandlerDraft.operation =
                     (type.parentClass as KClass<Operation>).java.getDeclaredConstructor().newInstance()
-                ConfigureOperationGUI(this.item, this.actionHandlerDraft).show(player)
+                ConfigureOperationGUI(this.item, this.actionHandlerDraft, onReturn).show(player)
             }, { player ->
-                ConfigureOperationGUI(this.item, this.actionHandlerDraft).show(player)
+                ConfigureOperationGUI(this.item, this.actionHandlerDraft, onReturn).show(player)
             }, "", this.actionHandlerDraft.operation.type).show()
         }
     }
@@ -89,7 +90,7 @@ class ConfigureOperationGUI(val item: CustomItem, private val actionHandler: Act
         item.itemMeta = meta
         return GuiItem(item) {
             data.showConfigurationGUI(player) {
-                ConfigureOperationGUI(this.item, actionHandlerDraft).show(player)
+                ConfigureOperationGUI(this.item, actionHandlerDraft, onReturn).show(player)
             }
         }
     }
@@ -109,7 +110,7 @@ class ConfigureOperationGUI(val item: CustomItem, private val actionHandler: Act
 
         item.itemMeta = meta
         return GuiItem(item) { click ->
-            AddItemActionHandlerGUI(click.whoClicked as Player, this.item, this.actionHandlerDraft).show()
+            AddItemActionHandlerGUI(click.whoClicked as Player, this.item, this.actionHandlerDraft, onReturn).show()
         }
     }
 
@@ -140,7 +141,7 @@ class ConfigureOperationGUI(val item: CustomItem, private val actionHandler: Act
         meta.displayName("§aBack".asTextComponent().withoutItalics())
         item.itemMeta = meta
         navigationPane.addItem(GuiItem(item) {
-            AddItemActionHandlerGUI(player, this.item, this.actionHandler).show()
+            AddItemActionHandlerGUI(player, this.item, this.actionHandler, onReturn).show()
         }, 0, 0)
         gui.addPane(navigationPane)
 

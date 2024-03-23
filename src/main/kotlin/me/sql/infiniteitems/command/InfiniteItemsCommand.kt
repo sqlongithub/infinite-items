@@ -4,7 +4,7 @@ import co.aikar.commands.BaseCommand
 import co.aikar.commands.CommandHelp
 import co.aikar.commands.annotation.*
 import co.aikar.commands.bukkit.contexts.OnlinePlayer
-import me.sql.infiniteitems.gui.CreateItemGUI
+import me.sql.infiniteitems.gui.ConfigureItemGUI
 import me.sql.infiniteitems.item.CustomItem
 import me.sql.infiniteitems.item.CustomItemRegistry
 import me.sql.infiniteitems.util.asTextComponent
@@ -51,7 +51,7 @@ class InfiniteItemsCommand : BaseCommand() {
             customItem.material = player.inventory.itemInMainHand.type
         }
 
-        val createItemGUI = CreateItemGUI(customItem, player)
+        val createItemGUI = ConfigureItemGUI("Creating Custom Item", customItem, player)
         createItemGUI.show()
     }
 

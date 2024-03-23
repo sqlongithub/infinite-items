@@ -19,13 +19,17 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.*
+import java.util.function.Consumer
 
-class AddItemActionHandlerGUI(private val player: Player,
-                              private val item: CustomItem,
-                              var actionHandler: ActionHandler = ActionHandler(ActionType.RIGHT_CLICK,
-                                  NoneOperation(),
-                                  NoneCondition()
-                              )) {
+class AddItemActionHandlerGUI(
+    private val player: Player,
+    private val item: CustomItem,
+    var actionHandler: ActionHandler = ActionHandler(
+        ActionType.RIGHT_CLICK,
+        NoneOperation(),
+        NoneCondition(),
+    ),
+    private val onReturn: Consumer<Player>) {
 
 
     private fun getReturnItem(): GuiItem {
@@ -35,7 +39,7 @@ class AddItemActionHandlerGUI(private val player: Player,
         meta.displayName("§aBack".asTextComponent().withoutItalics())
         item.itemMeta = meta
         return GuiItem(item) { click ->
-            ConfigureItemActionsGUI(this.item).show(click.whoClicked as Player)
+            ConfigureItemActionsGUI(this.item, onReturn).show(click.whoClicked as Player)
         }
     }
 
@@ -60,7 +64,7 @@ class AddItemActionHandlerGUI(private val player: Player,
                 this.actionHandler.type = type as ActionType
                 this.show()
             }, { player ->
-                AddItemActionHandlerGUI(player, this.item, this.actionHandler).show()
+                AddItemActionHandlerGUI(player, this.item, this.actionHandler, onReturn).show()
             }, "Execute when ", this.actionHandler.type).show()
         }
     }
@@ -161,7 +165,7 @@ class AddItemActionHandlerGUI(private val player: Player,
 
         item.itemMeta = meta
         return GuiItem(item) {
-            ConfigureOperationGUI(this.item, this.actionHandler).show(player)
+            ConfigureOperationGUI(this.item, this.actionHandler, onReturn).show(player)
         }
     }
 
@@ -231,7 +235,7 @@ class AddItemActionHandlerGUI(private val player: Player,
             if(actionHandler.operation !is NoneOperation) {
                 player.playSound(player.location, Sound.BLOCK_NOTE_BLOCK_BELL, 0.7f, 1.5f)
                 this.item.actionHandlers.add(actionHandler)
-                ConfigureItemActionsGUI(this.item).show(player)
+                ConfigureItemActionsGUI(this.item, onReturn = onReturn).show(player)
             } else {
                 player.playSound(player.location, Sound.BLOCK_NOTE_BLOCK_BASS, 0.7f, 0.8f)
             }

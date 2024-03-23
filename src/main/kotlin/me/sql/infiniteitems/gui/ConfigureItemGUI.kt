@@ -4,6 +4,7 @@ import com.github.stefvanschie.inventoryframework.gui.GuiItem
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui
 import com.github.stefvanschie.inventoryframework.pane.OutlinePane
 import com.github.stefvanschie.inventoryframework.pane.StaticPane
+import me.sql.infiniteitems.InfiniteItems
 import me.sql.infiniteitems.item.CustomItem
 import me.sql.infiniteitems.util.*
 import net.kyori.adventure.text.Component
@@ -15,7 +16,11 @@ import org.bukkit.inventory.ItemStack
 import java.util.function.Consumer
 import kotlin.time.measureTime
 
-class CreateItemGUI(private val customItem: CustomItem, val player: Player) {
+class ConfigureItemGUI(
+    private val title: String,
+    private val customItem: CustomItem,
+    val player: Player,
+) {
 
     private fun getChangeItemNameButton(): GuiItem {
         val itemStack = ItemStack(Material.OAK_SIGN)
@@ -105,7 +110,9 @@ class CreateItemGUI(private val customItem: CustomItem, val player: Player) {
         itemStack.itemMeta = itemMeta
 
         return GuiItem(itemStack) { click ->
-            ConfigureItemActionsGUI(customItem).show(player)
+            ConfigureItemActionsGUI(customItem) { player ->
+                ConfigureItemGUI(title, customItem, player).show()
+            }.show(player)
         }
     }
 
@@ -154,8 +161,8 @@ class CreateItemGUI(private val customItem: CustomItem, val player: Player) {
     }
 
     fun show() {
-        player.sendMessage(Component.text(measureTime {
-            val gui = ChestGui(5, "Creating Custom Item")
+        val showGui = {
+            val gui = ChestGui(5, title)
             gui.setOnTopClick { event ->
                 event.isCancelled = true
             }
@@ -178,7 +185,12 @@ class CreateItemGUI(private val customItem: CustomItem, val player: Player) {
             finishActionsPane.addItem(getCreateButton(), 2, 0)
             gui.addPane(finishActionsPane)
             gui.show(player)
-        }.inWholeMilliseconds.toString() + " ms"))
+        }
+        if(InfiniteItems.debugging) {
+            player.sendMessage(Component.text((measureTime(showGui).inWholeMicroseconds * 1000f).toString() + " ms"))
+        } else {
+            showGui()
+        }
     }
 
 }
