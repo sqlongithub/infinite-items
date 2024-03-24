@@ -12,5 +12,6 @@ interface Operation {
     val data: List<OperationData>
     fun execute(action: Action)
     fun forActionType(actionType: ActionType): Operation
+    fun toMap(): HashMap<String, Any>
 
 }

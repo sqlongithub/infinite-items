@@ -6,19 +6,22 @@ import me.sql.infiniteitems.item.action.operation.data.HitPlayersOperationData
 import me.sql.infiniteitems.item.action.operation.data.MessageOperationData
 import me.sql.infiniteitems.item.action.operation.data.OperationData
 import me.sql.infiniteitems.item.action.operation.data.PlayersOperationData
-import me.sql.infiniteitems.item.action.type.HitPlayerAction
-import me.sql.infiniteitems.util.asTextComponent
-import me.sql.infiniteitems.util.withoutItalics
-import org.bukkit.entity.Player
+import me.sql.infiniteitems.util.debug
 
 class SendMessageOperation(private val message: MessageOperationData, private val players: PlayersOperationData) : Operation {
 
-    constructor(actionType: ActionType) : this(MessageOperationData {
-        return@MessageOperationData "Hello, World!".asTextComponent().withoutItalics()
-    }, if(actionType == ActionType.HIT_PLAYER)
+    constructor(actionType: ActionType) : this(MessageOperationData("Hello, World!"),
+        if(actionType == ActionType.HIT_PLAYER)
             HitPlayersOperationData(false, false, true)
         else
             PlayersOperationData(isAll = false, isUser = true))
+
+    constructor(actionType: ActionType, configurationMap: Map<String, *>)
+            : this(MessageOperationData(configurationMap),
+        if(actionType == ActionType.HIT_PLAYER)
+            HitPlayersOperationData(configurationMap)
+        else
+            PlayersOperationData(configurationMap))
 
     override val type = OperationType.SEND_MESSAGE
     override val name: String = "Send Message"
@@ -29,7 +32,7 @@ class SendMessageOperation(private val message: MessageOperationData, private va
 
     override fun execute(action: Action) {
         for(player in players.getOnlinePlayers(action)) {
-            player.sendMessage(message.getMessage(player))
+            player.sendMessage(message.getFormattedValue(player))
         }
     }
 
@@ -39,6 +42,17 @@ class SendMessageOperation(private val message: MessageOperationData, private va
         } else {
             SendMessageOperation(message, PlayersOperationData(players.isAll, players.isUser))
         }
+    }
+
+    override fun toMap(): HashMap<String, Any> {
+        val map = LinkedHashMap<String, Any>()
+        map["type"] = type.name
+        map["message"] = message.message
+        map["players"] = players.toMap()
+
+        debug(map.toString())
+
+        return map
     }
 
 }

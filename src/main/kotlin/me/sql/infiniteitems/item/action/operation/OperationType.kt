@@ -4,7 +4,7 @@ import me.sql.infiniteitems.Selectable
 import org.bukkit.Material
 import kotlin.reflect.KClass
 
-enum class OperationType(override val parentClass: KClass<*>,
+enum class OperationType(override val parentClass: KClass<out Operation>,
                          override val material: Material,
                          override val description: String) : Selectable {
 

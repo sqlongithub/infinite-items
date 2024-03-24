@@ -8,10 +8,7 @@ import com.github.stefvanschie.inventoryframework.pane.Pane
 import com.github.stefvanschie.inventoryframework.pane.StaticPane
 import me.sql.infiniteitems.InfiniteItems
 import me.sql.infiniteitems.item.action.Action
-import me.sql.infiniteitems.util.add
-import me.sql.infiniteitems.util.asTextComponent
-import me.sql.infiniteitems.util.getBackgroundPane
-import me.sql.infiniteitems.util.withoutItalics
+import me.sql.infiniteitems.util.*
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Bukkit
@@ -19,17 +16,72 @@ import org.bukkit.Material
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.SkullMeta
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.scheduler.BukkitTask
-import org.w3c.dom.Text
 import java.util.function.Consumer
 
 open class PlayersOperationData(
     var isAll: Boolean, var isUser: Boolean,
-    private var players: ArrayList<OfflinePlayer> = ArrayList()
+    var players: ArrayList<OfflinePlayer> = ArrayList()
 ) : OperationData {
+
+    companion object {
+        fun getIsAll(config: Map<String, *>): Boolean {
+            if(!config.containsKey("players")) {
+                Bukkit.getLogger().warning("Error reading config: no field 'players' for operation")
+                return false
+            }
+            val playersConfig = config["players"]
+            if(playersConfig == null || playersConfig !is Map<*, *>) {
+                Bukkit.getLogger().warning("Error reading config: malformed field 'players' for operation")
+                return false
+            }
+            val isEveryone = playersConfig.tryGetBoolean("everyone",
+                "Error reading config: value 'everyone' is not a boolean (true or false) for operation")
+            debug("        - everyone: $isEveryone")
+
+            return isEveryone
+        }
+
+        fun getIsUser(config: Map<String, *>): Boolean {
+            if(!config.containsKey("players")) {
+                return false
+            }
+            val playersConfig = config["players"]
+            if(playersConfig == null || playersConfig !is Map<*, *>) {
+                return false
+            }
+            val isUser = playersConfig.tryGetBoolean("player",
+                "Error reading config: value 'player' is not a boolean (true or false) operation")
+            debug("        - player: $isUser")
+            return isUser
+        }
+
+        fun getPlayers(config: Map<String, *>): ArrayList<OfflinePlayer> {
+            if(!config.containsKey("players")) {
+                return ArrayList(emptyList())
+            }
+            if(config["players"] !is Map<*, *>) {
+                return ArrayList(emptyList())
+            }
+
+            val playersMap = config["players"] as Map<*, *>
+            debug("      - players:")
+
+            val list = ArrayList<OfflinePlayer>()
+            debug("        - list:")
+            for(player in ((playersMap["list"] ?: listOf<String>()) as List<*>).filterIsInstance<String>()) {
+                list.add(Bukkit.getOfflinePlayer(player))
+                debug("          - ${list[list.size - 1].name}")
+            }
+
+            return list
+        }
+    }
+
+    constructor(config: Map<String, *>) : this(getIsAll(config), getIsUser(config), getPlayers(config))
+
 
     override val name = "Players"
     override val description = "These are the players the operation applies to."
@@ -73,11 +125,11 @@ open class PlayersOperationData(
         // this is all so bad ugghhghghgh
         isAllItem = ItemStack(if(isAll) { Material.LIME_DYE } else { Material.GRAY_DYE })
         isAllMeta = isAllItem.itemMeta!!
-        isAllLore = ArrayList<TextComponent>()
+        isAllLore = ArrayList()
 
         thePlayerItem = ItemStack(if(isUser) { Material.LIME_DYE } else { Material.GRAY_DYE })
         thePlayerMeta = thePlayerItem.itemMeta!!
-        thePlayerLore = ArrayList<TextComponent>()
+        thePlayerLore = ArrayList()
 
         gui.addPane(getBackgroundPane(6))
         gui.setOnTopClick { click ->
@@ -181,17 +233,15 @@ open class PlayersOperationData(
             anvilGui.resultComponent.addPane(playerPane)
 
 
-            var newSkullOwner: String = "Notch"
             var updateTask: BukkitTask? = null
             anvilGui.setOnNameInputChanged { name ->
-                newSkullOwner = name
                 skullMeta.displayName(name.asTextComponent().withoutItalics().color(NamedTextColor.WHITE))
                 playerSkull.itemMeta = skullMeta
                 updateTask?.cancel()
                 updateTask = object : BukkitRunnable() {
                     override fun run() {
-                        if(newSkullOwner.isEmpty()) return
-                        skullMeta.owningPlayer = Bukkit.getOfflinePlayer(newSkullOwner)
+                        if(name.isEmpty()) return
+                        skullMeta.owningPlayer = Bukkit.getOfflinePlayer(name)
                         playerSkull.itemMeta = skullMeta
                         Bukkit.getScheduler().runTask(InfiniteItems.instance) { _ ->
                             anvilGui.update()
@@ -233,11 +283,27 @@ open class PlayersOperationData(
         return ("to: §a${getFormattedValue(player)}")
     }
 
+    override fun toMap(): LinkedHashMap<String, Any> {
+        val playersMap = LinkedHashMap<String, Any>()
+        playersMap["everyone"] = isAll
+        playersMap["player"] = isUser
+
+        val playersList = ArrayList<String>()
+        for(player in players) {
+            if(!player.name.isNullOrBlank()) {
+                playersList.add(player.name!!)
+            }
+        }
+        playersMap["list"] = playersList
+
+        return playersMap
+    }
+
     open fun getOnlinePlayers(action: Action): List<Player> = when(isAll) {
         true -> Bukkit.getOnlinePlayers().toList()
         else -> when(isUser) {
             true -> listOf(action.player)
-            else -> players.filterIsInstance<Player>()
+            else -> players.mapNotNull { it.player }
         }
     }
 
@@ -247,5 +313,6 @@ open class PlayersOperationData(
             allPlayers.addAll(getOnlinePlayers(action))
         return allPlayers.toList()
     }
+
 
 }

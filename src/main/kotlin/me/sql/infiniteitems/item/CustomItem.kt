@@ -54,6 +54,7 @@ class CustomItem(
 
     fun create() {
         CustomItemRegistry.register(this)
+        CustomItemRegistry.saveToConfigAsync()
     }
 
     fun handleAction(action: Action) {

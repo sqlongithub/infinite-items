@@ -23,6 +23,26 @@ class HitPlayersOperationData(isAll: Boolean,
     private var isHitPlayerMeta = isHitPlayerItem.itemMeta!!
     private var isHitPlayerLore = ArrayList<TextComponent>()
 
+    companion object {
+        fun getIsHit(config: Map<String, *>): Boolean {
+            if(!config.containsKey("players")) {
+                return false
+            }
+            val playersMap = config["players"]
+            if(playersMap !is Map<*, *>) {
+                return false
+            }
+
+            val isHitPlayer = playersMap["hit_player"] ?: false
+            if(isHitPlayer !is Boolean) {
+                return false
+            }
+            return isHitPlayer
+        }
+    }
+
+    constructor(config: Map<String, *>) : this(getIsAll(config), getIsUser(config), getIsHit(config), getPlayers(config))
+
     override fun updateGui() {
         super.updateGui()
 
@@ -78,6 +98,15 @@ class HitPlayersOperationData(isAll: Boolean,
     override fun getOnlinePlayers(action: Action): List<Player> = when(isUser) {
         true -> listOf((action as HitPlayerAction).hitPlayer)
         else -> super.getOnlinePlayers(action)
+    }
+
+    override fun toMap(): LinkedHashMap<String, Any> {
+        val map = super.toMap()
+        val newMap = map.clone() as LinkedHashMap<String, Any>
+        newMap.clear()
+        newMap["hit_player"] = isHit
+        newMap.putAll(map)
+        return newMap
     }
 
 }

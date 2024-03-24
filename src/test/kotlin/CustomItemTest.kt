@@ -5,18 +5,17 @@ import me.sql.infiniteitems.event.ActionListener
 import me.sql.infiniteitems.item.CustomItem
 import me.sql.infiniteitems.item.CustomItemRegistry
 import me.sql.infiniteitems.item.action.ActionType
-import me.sql.infiniteitems.item.action.type.RightClickAction
 import me.sql.infiniteitems.item.action.condition.NoneCondition
 import me.sql.infiniteitems.item.action.handler.ActionHandler
 import me.sql.infiniteitems.item.action.operation.SendMessageOperation
 import me.sql.infiniteitems.item.action.operation.data.MessageOperationData
 import me.sql.infiniteitems.item.action.operation.data.PlayersOperationData
+import me.sql.infiniteitems.item.action.type.RightClickAction
 import me.sql.infiniteitems.util.asTextComponent
 import me.sql.infiniteitems.util.withoutItalics
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack
-import org.bukkit.entity.Player
 import kotlin.test.*
 
 class CustomItemTest {
@@ -56,9 +55,7 @@ class CustomItemTest {
          val customItem = CustomItem("custom item", "§cSuper§aCool§9Item".asTextComponent(), Material.DIRT, 64)
 
          val players = PlayersOperationData(true, false)
-         val message = MessageOperationData { _: Player ->
-             return@MessageOperationData "test".asTextComponent()
-         }
+         val message = MessageOperationData("test")
          val operation = SendMessageOperation(message, players)
          val handler = ActionHandler(ActionType.RIGHT_CLICK, operation, NoneCondition())
 

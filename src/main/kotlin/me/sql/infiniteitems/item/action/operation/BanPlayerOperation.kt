@@ -4,11 +4,8 @@ import me.sql.infiniteitems.InfiniteItems
 import me.sql.infiniteitems.item.action.Action
 import me.sql.infiniteitems.item.action.ActionType
 import me.sql.infiniteitems.item.action.operation.data.HitPlayersOperationData
-import me.sql.infiniteitems.item.action.operation.data.MessageOperationData
 import me.sql.infiniteitems.item.action.operation.data.OperationData
 import me.sql.infiniteitems.item.action.operation.data.PlayersOperationData
-import me.sql.infiniteitems.util.asTextComponent
-import me.sql.infiniteitems.util.withoutItalics
 import org.bukkit.Bukkit
 
 class BanPlayerOperation(val players: PlayersOperationData) : Operation {
@@ -16,13 +13,16 @@ class BanPlayerOperation(val players: PlayersOperationData) : Operation {
     override val name = "Ban Player"
     override val description
         get() = "Permanently ban §a${players.getFormattedValue(null)}"
-    override val data = listOf(players)
+    override val data: List<OperationData>
+        get() = listOf(players)
 
     constructor(actionType: ActionType) : this(
         if(actionType == ActionType.HIT_PLAYER)
             HitPlayersOperationData(false, false, true)
         else
             PlayersOperationData(isAll = false, isUser = false))
+
+    constructor(actionType: ActionType, config: Map<String, *>) : this(PlayersOperationData(config))
 
     override fun execute(action: Action) {
         if(InfiniteItems.DEBUGGING) {
@@ -39,6 +39,14 @@ class BanPlayerOperation(val players: PlayersOperationData) : Operation {
         } else {
             BanPlayerOperation(players)
         }
+    }
+
+    override fun toMap(): HashMap<String, Any> {
+        val map = LinkedHashMap<String, Any>()
+        map["type"] = type.name
+        map["players"] = players.toMap()
+
+        return map
     }
 
 

@@ -149,13 +149,14 @@ class ConfigureItemGUI(
         val itemStack = ItemStack(Material.GREEN_CONCRETE)
         val itemMeta = itemStack.itemMeta
 
-        itemMeta.displayName(Component.text("§aCreate").withoutItalics())
+        itemMeta.displayName(Component.text("§aSave").withoutItalics())
 
         itemStack.itemMeta = itemMeta
         return GuiItem(itemStack) {
             customItem.create()
             player.inventory.addItem(customItem.getItemStack(player))
             player.closeInventory()
+            // TODO: what if edit ?????????????????????????????????????????????????????????????
             player.sendMessage("§aSuccessfully created custom item §r${customItem.alias}§a!")
         }
     }

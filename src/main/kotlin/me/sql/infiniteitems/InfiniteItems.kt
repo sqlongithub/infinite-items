@@ -27,6 +27,12 @@ open class InfiniteItems : JavaPlugin() {
 
         Bukkit.getPluginManager().registerEvents(ActionListener(), this)
 
+        CustomItemRegistry.loadFromConfigAsync()
+    }
+
+    override fun onDisable() {
+        // some weird error about classnotdef kotlin thingy
+        // CustomItemRegistry.saveToConfigSync()
     }
 
 }

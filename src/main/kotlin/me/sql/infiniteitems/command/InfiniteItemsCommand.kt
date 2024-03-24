@@ -86,4 +86,20 @@ class InfiniteItemsCommand : BaseCommand() {
         }
     }
 
+    @Subcommand("reload|refresh|loadconfig|sync")
+    @Description("Load custom items from config")
+    fun onReload(sender: CommandSender) {
+        sender.sendMessage("§aLoading from config...")
+        CustomItemRegistry.loadFromConfigAsync()
+        sender.sendMessage("§aDone!")
+    }
+
+    @Subcommand("save|writeconfig")
+    @Description("Save custom items to config")
+    fun onSave(sender: CommandSender) {
+        sender.sendMessage("§aSaving to config...")
+        CustomItemRegistry.saveToConfigAsync()
+        sender.sendMessage("§aDone!")
+    }
+
 }
